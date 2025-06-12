@@ -18,7 +18,9 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Button } from '@/components/ui/button';
-import { Sparkle } from 'lucide-react';
+import { LoaderPinwheelIcon, Sparkle } from 'lucide-react';
+import axios from 'axios';
+import { is } from 'drizzle-orm';
 
 interface CreateNewCourseProps {
     children: React.ReactNode;
@@ -36,16 +38,29 @@ const CreateNewCourse = ({ children }: CreateNewCourseProps) => {
     };
 
     const [formData, setformData] = useState<FormData>({});
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+
 
     const HandleInputChange = (field: keyof FormData, value: string | boolean) => {
         setformData((prevData) => ({
             ...prevData,
             [field]: value,
         }));
+        //ANCHOR - Console is here
+        console.log(`Field: ${field}, Value: ${value}`);
     }
 
-    const onGenerate = () => {
+    const onGenerate = async () => {
+        //ANCHOR - Console is here
         console.log("Form Data:", formData);
+        setIsLoading(true);
+        const result = await axios.post('/api/generate-course-layout', {
+            ...formData,
+        })
+        setIsLoading(false);
+
+        //ANCHOR - Console is here
+        console.log("Generated Course Data:", result.data);
     }
 
     return (
@@ -94,7 +109,10 @@ const CreateNewCourse = ({ children }: CreateNewCourseProps) => {
                                     onChange={(e) => HandleInputChange("category", e.target.value)} />
                             </div>
                             <div className='flex flex-col gap-1'>
-                                <Button className='cursor-pointer mt-4' onClick={onGenerate}><Sparkle /> Generate</Button>
+                                <Button className='cursor-pointer mt-4' onClick={onGenerate} disabled={isLoading}>
+                                    {isLoading ? <LoaderPinwheelIcon className='animate-spin' /> : <Sparkle />}
+                                    Generate
+                                </Button>
                             </div>
                         </div>
                     </DialogDescription>

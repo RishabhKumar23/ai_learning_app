@@ -1,10 +1,10 @@
+import db from "@/config/db";
+import { coursesTable } from "@/config/schema";
+import { currentUser } from "@clerk/nextjs/server";
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 
-export async function POST(request: Request) {
-  const formData = await request.json();
-
-  const PROMPT = `Generate Learning Course depends on the following details.
+const PROMPT = `Generate Learning Course depends on the following details.
 Make sure to add:
 
 Course Name
@@ -28,29 +28,29 @@ json
 Copy
 Edit
 {
-  "course": {
-    "name": "string",
-    "description": "string",
-    "category": "string",
-    "level": "string",
-    "includeVideo": "boolean",
-    "noOfChapters": "number",
-    "bannerImagePrompt": "string",
-    "chapters": [
-      {
-        "chapterName": "string",
-        "duration": "string",
-        "topics": [
-          "string"
-        ]
-      }
-    ]
-  }
+"course": {
+  "name": "string",
+  "description": "string",
+  "category": "string",
+  "level": "string",
+  "includeVideo": "boolean",
+  "noOfChapters": "number",
+  "bannerImagePrompt": "string",
+  "chapters": [
+    {
+      "chapterName": "string",
+      "duration": "string",
+      "topics": [
+        "string"
+      ]
+    }
+  ]
+}
 }`;
 
-  // To run this code you need to install the following dependencies:
-  // npm install @google/genai mime
-  // npm install -D @types/node
+export async function POST(request: Request) {
+  const formData = await request.json();
+  const user = await currentUser();
 
   const ai = new GoogleGenAI({
     apiKey: process.env.GEMINI_API_KEY,
@@ -75,13 +75,17 @@ Edit
     config,
     contents,
   });
-  if (response?.text) {
-    console.log(response.text);
-  } else {
-    console.log("No text in response");
-  }
+
+  console.log(response.candidates?.[0]?.content?.parts?.[0]?.text ?? "No response text");
 
   //TODO - Save the response to the database
+  //   const result = await db.insert(coursesTable).values({
+  //     ...formData,
+  //     courseJson: response.text,
+  //     userEmail: user?.primaryEmailAddress?.emailAddress,
+  //   });
 
-  return NextResponse.json(response.text ? JSON.parse(response.text) : { error: "No response text" });
+  return NextResponse.json(
+    response.text ? JSON.parse(response.text) : { error: "No response text" }
+  );
 }
