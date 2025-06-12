@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import { BookOpen, CompassIcon, LayoutDashboardIcon, PenIcon, UserCircle2Icon, WalletCardsIcon } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import CreateNewCourse from './CreateNewCourse'
 
 const SidebarOptions = [
     {
@@ -26,7 +27,7 @@ const SidebarOptions = [
     {
         name: 'My Learning',
         icon: BookOpen,
-        path: '/workspace/mylearning'
+        path: '/workspace/my-learning'
     },
     {
         name: 'Explore',
@@ -61,7 +62,9 @@ const AppSidebar = () => {
             <SidebarContent>
                 <SidebarGroup className='' />
                 {/* <div className='flex items-center justify-center h-20'> */}
-                <Button className='mt-5 cursor-pointer hover:bg-white hover:text-black hover:border-black'>Create New Course</Button>
+                <CreateNewCourse>
+                    <Button className='mt-5  bg-blue-500 hover:bg-blue-300 cursor-pointer hover:text-black hover:border-black'>Create New Course</Button>
+                </CreateNewCourse>
                 {/* </div> */}
                 <SidebarGroup />
                 <SidebarGroup>
@@ -69,12 +72,12 @@ const AppSidebar = () => {
                         <SidebarMenu>
                             {SidebarOptions.map((items, index) => (
                                 <SidebarMenuItem key={index}>
-                                    <SidebarMenuButton asChild className='p-5'>
+                                    <SidebarMenuButton asChild className='p-5 hover:bg-blue-300'>
                                         <Link href={items.path} className={`text-xl font-semibold
-                                            ${path.includes(items.path) ? 'bg-white text-black border-black' : 'text-gray-500 hover:bg-white hover:text-black hover:border-black'} 
+                                            ${path.includes(items.path) ? 'bg-blue-300 text-black border-black' : 'text-gray-500 hover:bg-blue-300 hover:text-black hover:border-blue-500'} 
                                             flex items-center gap-2 rounded-md transition-all duration-200 ease-in-out hover:shadow-lg focus:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-black
                                             `}>
-                                            <items.icon className="h-20 w-20"/>
+                                            <items.icon className="h-20 w-20" />
                                             <span className=''>{items.name}</span>
                                         </Link>
                                     </SidebarMenuButton>
