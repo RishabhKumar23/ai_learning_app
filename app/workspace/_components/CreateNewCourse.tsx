@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/button';
 import { LoaderPinwheelIcon, Sparkle } from 'lucide-react';
 import axios from 'axios';
 import { is } from 'drizzle-orm';
+import { v4 as uuidv4 } from "uuid";
 
 interface CreateNewCourseProps {
     children: React.ReactNode;
@@ -53,14 +54,23 @@ const CreateNewCourse = ({ children }: CreateNewCourseProps) => {
     const onGenerate = async () => {
         //ANCHOR - Console is here
         console.log("Form Data:", formData);
-        setIsLoading(true);
-        const result = await axios.post('/api/generate-course-layout', {
-            ...formData,
-        })
-        setIsLoading(false);
+        
+        const courseId = uuidv4(); // Generate a unique course ID
 
-        //ANCHOR - Console is here
-        console.log("Generated Course Data:", result.data);
+        try {
+            setIsLoading(true);
+            const result = await axios.post('/api/generate-course-layout', {
+                ...formData,
+                courseId: courseId
+            })
+            setIsLoading(false);
+            //ANCHOR - Console is here
+            console.log("Generated Course Data:", result.data);
+
+        } catch (error) {
+            setIsLoading(false);
+            console.error("Error generating course layout:", error);
+        }
     }
 
     return (

@@ -3,6 +3,7 @@ import { coursesTable } from "@/config/schema";
 import { currentUser } from "@clerk/nextjs/server";
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
+import { v4 as uuidv4 } from "uuid";
 
 const PROMPT = `Generate Learning Course depends on the following details.
 Make sure to add:
@@ -49,7 +50,7 @@ Edit
 }`;
 
 export async function POST(request: Request) {
-  const formData = await request.json();
+  const { courseId, ...formData } = await request.json();
   const user = await currentUser();
 
   const ai = new GoogleGenAI({
@@ -76,16 +77,32 @@ export async function POST(request: Request) {
     contents,
   });
 
-  console.log(response.candidates?.[0]?.content?.parts?.[0]?.text ?? "No response text");
+  // Extract and clean the JSON from the response text
+  let responseText = response.text ?? "";
+  responseText = responseText
+    .replace(/```json/i, "")
+    .replace(/```/g, "")
+    .trim();
 
-  //TODO - Save the response to the database
+  let jsonResponse: any = {};
+  try {
+    jsonResponse = JSON.parse(responseText);
+    console.log("AI Response JSON:", jsonResponse);
+  } catch (e) {
+    console.error("Failed to parse AI response as JSON:", e, responseText);
+    return NextResponse.json(
+      { error: "Invalid AI response format", details: responseText },
+      { status: 500 }
+    );
+  }
+
+  // TODO - Save the response to the database
   //   const result = await db.insert(coursesTable).values({
   //     ...formData,
-  //     courseJson: response.text,
+  //     courseJson: jsonResponse,
   //     userEmail: user?.primaryEmailAddress?.emailAddress,
+  //     courseId: courseId,
   //   });
 
-  return NextResponse.json(
-    response.text ? JSON.parse(response.text) : { error: "No response text" }
-  );
+  return NextResponse.json(jsonResponse);
 }
