@@ -97,12 +97,21 @@ export async function POST(request: Request) {
   }
 
   // TODO - Save the response to the database
-  //   const result = await db.insert(coursesTable).values({
-  //     ...formData,
-  //     courseJson: jsonResponse,
-  //     userEmail: user?.primaryEmailAddress?.emailAddress,
-  //     courseId: courseId,
-  //   });
+  const result = await db.insert(coursesTable).values({
+    //     ...formData,
+    // courseJson: jsonResponse,
+    //     userEmail: user?.primaryEmailAddress?.emailAddress,
+    //     courseId: courseId,
+    courseId: courseId,
+    course_name: formData.courseName,
+    description: formData.courseDescription,
+    noOfChapters: parseInt(formData.totalChapter),
+    includeVideo: formData.videoLecture ?? false,
+    difficulty: formData.difficulty,
+    category: formData.category,
+    courseJson: jsonResponse,
+    userEmail: user?.primaryEmailAddress?.emailAddress,
+  });
 
-  return NextResponse.json(jsonResponse);
+  return NextResponse.json({ courseId: courseId, jsonResponse });
 }

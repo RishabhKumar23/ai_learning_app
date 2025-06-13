@@ -54,7 +54,7 @@ const CreateNewCourse = ({ children }: CreateNewCourseProps) => {
     const onGenerate = async () => {
         //ANCHOR - Console is here
         console.log("Form Data:", formData);
-        
+
         const courseId = uuidv4(); // Generate a unique course ID
 
         try {
